@@ -12,11 +12,15 @@ HeadHunter и SuperJob.
 3. Python3 должен быть уже установлен. 
 Затем используйте pip (или pip3, есть есть конфликт с Python2) для установки зависимостей:
    
-```pip install -r requirements.txt```
+    ```
+    pip install -r requirements.txt
+    ```
 
 ### Использование
 
-```python main.py```
+```
+python main.py
+```
 
 
 ### Цель проекта
