@@ -1,4 +1,3 @@
-from itertools import count
 import os
 from itertools import count
 
@@ -90,7 +89,7 @@ def predict_salary(salary_from, salary_to):
     return int(average)
 
 
-def predict_rub_salary_hh(vacancy):
+def predict_rub_salary_for_hh(vacancy):
     if not vacancy.get('salary') or vacancy['salary'].get('currency') != 'RUR':
         return None
     return predict_salary(vacancy['salary'].get('from'), vacancy['salary'].get('to'))
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     load_dotenv()
     token = os.getenv('JOBS_TOKEN')
     try:
-        hh = {language: get_average_salary(fetch_vacancies_hh_ru(language), predict_rub_salary_hh)
+        hh = {language: get_average_salary(fetch_vacancies_hh_ru(language), predict_rub_salary_for_hh)
               for language in list_language}
     except requests.exceptions.HTTPError as e:
         print("Ошибка запроса HeadHunter", e)
