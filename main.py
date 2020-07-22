@@ -5,7 +5,7 @@ import requests
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
-list_language = [
+TOP_LANGUAGES = [
     'JavaScript',
     'Java',
     'Python',
@@ -30,7 +30,9 @@ def fetch_vacancies_hh_ru(language):
     items = []
     for page in count():
         params['page'] = page
-        response = requests.get(url, headers={'User-Agent': 'test'}, params=params)
+        response = requests.get(url,
+                                headers={'User-Agent': 'test'},
+                                params=params)
         response.raise_for_status()
         items += response.json()['items']
         if page + 1 >= response.json().get('pages'):
@@ -92,18 +94,26 @@ def predict_salary(salary_from, salary_to):
 def predict_rub_salary_for_hh(vacancy):
     if not vacancy.get('salary') or vacancy['salary'].get('currency') != 'RUR':
         return None
-    return predict_salary(vacancy['salary'].get('from'), vacancy['salary'].get('to'))
+    return predict_salary(vacancy['salary'].get('from'),
+                          vacancy['salary'].get('to'))
 
 
 def predict_rub_salary_for_sj(vacancy):
     if vacancy.get('payment') is None or vacancy.get('currency') != 'rub':
         return None
-    return predict_salary(vacancy.get('payment_from'), vacancy.get('payment_to'))
+    return predict_salary(vacancy.get('payment_from'),
+                          vacancy.get('payment_to'))
 
 
 def generate_table_lang(title, data):
-    header = ['Языки программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
-    rows_data = [[name, stat['vacancies_found'], stat['vacancies_processed'], stat['average_salary']]
+    header = ['Языки программирования',
+              'Вакансий найдено',
+              'Вакансий обработано',
+              'Средняя зарплата']
+    rows_data = [[name,
+                  stat['vacancies_found'],
+                  stat['vacancies_processed'],
+                  stat['average_salary']]
                  for name, stat in data.items()]
     table_instance = AsciiTable([header] + rows_data, title)
     return table_instance.table
@@ -113,8 +123,9 @@ if __name__ == '__main__':
     load_dotenv()
     token = os.getenv('JOBS_TOKEN')
     try:
-        hh = {language: get_average_salary(fetch_vacancies_hh_ru(language), predict_rub_salary_for_hh)
-              for language in list_language}
+        hh = {language: get_average_salary(fetch_vacancies_hh_ru(language),
+                                           predict_rub_salary_for_hh)
+              for language in TOP_LANGUAGES}
     except requests.exceptions.HTTPError as e:
         print("Ошибка запроса HeadHunter", e)
     else:
@@ -123,8 +134,9 @@ if __name__ == '__main__':
     print()
 
     try:
-        jb = {language: get_average_salary(fetch_vacancies_sjob(language), predict_rub_salary_for_sj)
-              for language in list_language}
+        jb = {language: get_average_salary(fetch_vacancies_sjob(language),
+                                           predict_rub_salary_for_sj)
+              for language in TOP_LANGUAGES}
     except requests.exceptions.HTTPError as e:
         print("Ошибка запроса SuperJobs", e)
     else:
